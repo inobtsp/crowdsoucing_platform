@@ -8,7 +8,7 @@ const LaunchRequestHandler = {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
     handle(handlerInput) {
-        this.attributes['workername'] = '';
+        //this.attributes['workernames'] = '';
         const speakOutput = 'Welcome come to crowdsoucing platform, sign in your name to do the following step!';
         return handlerInput.responseBuilder
             .speak(speakOutput)
@@ -22,10 +22,12 @@ const SignInIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SignInIntent';
     },
     handle(handlerInput) {
-       //var workersname =  ;
-       this.attributes['workername'] =this.event.request.intent.slots.workername.value ;
-       console.log(this.attributes['workername']);
-        const speakOutput = 'Welecome to crowdsoucing platform' + this.attributes['workername'];
+        
+       var workersname =this.event.request.intent.slots.workername.value;
+        //this.attributes['workernames'] = ;
+        //console.log(this.attributes['workernames']);
+        //'Welecome to crowdsoucing platform' +
+        const speakOutput =  workersname;
         return handlerInput.responseBuilder
             .speak(speakOutput)
             //.reprompt('what do you want? Check task? Do task?')

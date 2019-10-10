@@ -43,7 +43,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-crowdsourcing_platform-default",
             "handler": "index.handler",
-            "revisionId": "da187bbe-205e-4327-96e6-a665668e2d16",
+            "revisionId": "618913be-1826-4e94-928f-4b1dc9b7a195",
             "runtime": "nodejs8.10"
           }
         ]
