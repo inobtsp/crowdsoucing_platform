@@ -1,0 +1,53 @@
+{
+  "deploy_settings": {
+    "default": {
+      "skill_id": "amzn1.ask.skill.abb254ba-4608-4113-a672-5e7928b804ae",
+      "was_cloned": false,
+      "merge": {},
+      "resources": {
+        "manifest": {
+          "eTag": "d42cfe87437326f0c8b8df280608c2c5"
+        },
+        "interactionModel": {
+          "en-US": {
+            "eTag": "27cec0ce75e2f8861f5505075a99718d"
+          }
+        }
+      }
+    },
+    "dante": {
+      "skill_id": "",
+      "was_cloned": false,
+      "merge": {}
+    },
+    "yangyanghe": {
+      "skill_id": "amzn1.ask.skill.2d6d85db-c88d-4504-8bb9-31820504e9f9",
+      "was_cloned": false,
+      "merge": {},
+      "resources": {
+        "manifest": {
+          "eTag": "723d52aaba467e518398db3e420257e6"
+        },
+        "interactionModel": {
+          "en-US": {
+            "eTag": "af5669c30ebe927d66247b8b5353e2ca"
+          }
+        },
+        "lambda": [
+          {
+            "alexaUsage": [
+              "custom/default"
+            ],
+            "arn": "arn:aws:lambda:us-east-1:043271782077:function:ask-custom-crowdsourcing_platform-default",
+            "awsRegion": "us-east-1",
+            "codeUri": "lambda/custom",
+            "functionName": "ask-custom-crowdsourcing_platform-default",
+            "handler": "index.handler",
+            "revisionId": "da187bbe-205e-4327-96e6-a665668e2d16",
+            "runtime": "nodejs8.10"
+          }
+        ]
+      }
+    }
+  }
+}
