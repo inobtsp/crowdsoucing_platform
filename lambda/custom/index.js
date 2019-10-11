@@ -2,6 +2,12 @@
 // Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
 // session persistence, api calls, and more.
 const Alexa = require('ask-sdk-core');
+const {
+  getRequestType,
+  getIntentName,
+  getSlotValue,
+  getDialogState,
+} = require('ask-sdk-core');
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -23,7 +29,8 @@ const SignInIntentHandler = {
     },
     handle(handlerInput) {
         
-       var workersname =this.event.request.intent.slots.workername.value;
+       //var workersname =this.event.request.intent.slots.workername.value;
+        var workersname = getSlotValue(handlerInput.requestEnvelope, 'workername');
         //this.attributes['workernames'] = ;
         //console.log(this.attributes['workernames']);
         //'Welecome to crowdsoucing platform' +
