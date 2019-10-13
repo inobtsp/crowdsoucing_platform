@@ -1,39 +1,48 @@
 {
-  "interactionModel": {
-      "languageModel": {
-          "invocationName": "crowdsourcing",
-          "intents": [
-              {
-                  "name": "AMAZON.CancelIntent",
-                  "samples": []
-              },
-              {
-                  "name": "AMAZON.HelpIntent",
-                  "samples": []
-              },
-              {
-                  "name": "AMAZON.StopIntent",
-                  "samples": []
-              },
-              {
-                "name": "SignInIntent",
-                "slots": [
-                    {
-                        "name": "workername",
-                        "type": "AMAZON.FirstName"
-                    }
-                ],
-                "samples": [
-                    "my name is {workername}",
-                    "sign in my name with {workername}"
-                ]
-              },
-              {
-                  "name": "AMAZON.NavigateHomeIntent",
-                  "samples": []
-              }
-          ],
-          "types": []
-      }
-  }
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "crowdsourcing",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "SignInIntent",
+                    "slots": [
+                        {
+                            "name": "workername",
+                            "type": "AMAZON.FirstName"
+                        }
+                    ],
+                    "samples": [
+                        "my name is {workername}",
+                        "sign in my name with {workername}"
+                    ]
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "CheckAvalible",
+                    "slots": [],
+                    "samples": [
+                        "check task",
+                        "check my avalible task",
+                        "what task I can do"
+                    ]
+                }
+            ],
+            "types": []
+        }
+    }
 }

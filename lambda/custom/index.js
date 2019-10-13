@@ -1,3 +1,5 @@
+//aws account: 576515628@qq.com
+//pwd: Dante24hyy
 // This sample demonstrates handling intents from an Alexa skill using the Alexa Skills Kit SDK (v2).
 // Please visit https://alexa.design/cookbook for additional examples on implementing slots, dialog management,
 // session persistence, api calls, and more.
@@ -9,12 +11,23 @@ const {
   getDialogState,
 } = require('ask-sdk-core');
 
+//load the file that can query the workers status based on the name
+const getworkers = require("../queryworkers")
+// Load the AWS SDK for Node.js
+const AWS = require('aws-sdk');
+// Set the region 
+AWS.config.update({region: 'REGION'});
+
+// Create the DynamoDB service object
+var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+
+
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
     handle(handlerInput) {
-        //this.attributes['workernames'] = '';
+        
         const speakOutput = 'Welcome come to crowdsoucing platform, sign in your name to do the following step!';
         return handlerInput.responseBuilder
             .speak(speakOutput)
@@ -22,42 +35,89 @@ const LaunchRequestHandler = {
             .getResponse();
     }
 };
+//sigin in intent
+//ask for user name and store the name as a session attribute
+//and output the name 
+//question1:  if I want to add the user into database, can I just direct do like this？ to call dynanodb in the handler? but I think ddb.putitem is a function
+// there are no nested function in nodejs right? 
+//question2: As I have a id attribute in dynanodb, is that means I have to find what the number if id are existe now and plus one? but how to do that?
+// I think is too tricky to read from db and plus one and write to db? Is there easier way to acheive that? Or just give up worker id, is that affect the system?
 const SignInIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SignInIntent';
     },
     handle(handlerInput) {
-        
-       //var workersname =this.event.request.intent.slots.workername.value;
-        var workersname = getSlotValue(handlerInput.requestEnvelope, 'workername');
-        //this.attributes['workernames'] = ;
-        //console.log(this.attributes['workernames']);
-        //'Welecome to crowdsoucing platform' +
-        const speakOutput =  workersname;
-        return handlerInput.responseBuilder
-            .speak(speakOutput)
-            //.reprompt('what do you want? Check task? Do task?')
-            .getResponse();
-    }
-};
+       const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+       var workersname= getSlotValue(handlerInput.requestEnvelope, 'workername');
+       sessionAttributes.signin_Name = workersname;
+       handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        const speakOutput =  'Hi' +sessionAttributes.signin_Name;
 
+       /*var params = {
+            TableName: 'worker',
+            Item: {
+              'workername' : {N: '0002'},
+              'workerid' : {S: sessionAttributes.signin_Name},
+              'task_complete':{L:[ { "N" : "1" }, { "N" : "2" }, { "N" : "3" }, { "N" : "4" }, { "N" : "5" }, { "N" : "6" } ]},
+              'task_incomplete':{L:[]}
+            }
+          };
 
-/*const CheckAvalibleIntentHandler = {
-    canHandle(handlerInput) {
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'CheckAvalible';
-    },
-    handle(handlerInput) {
-        var workersname =  this.event.request.intent.slots.workername.value
-        const speakOutput = 'Welecome to crowdsoucing platform'+workersname ;
+          // Call DynamoDB to add the item to the table
+          ddb.putItem(params, function(err, data) {
+            if (err) {
+              console.log("Error", err);
+            } else {
+              console.log("Success", data);
+            }
+          });*/
+
         return handlerInput.responseBuilder
             .speak(speakOutput)
             .reprompt('what do you want? Check task? Do task?')
             .getResponse();
     }
 };
-*/
+
+
+//check avalble task for the signin user
+//use the name that user have sign in and return the avalble task from dynanodb
+// the require task are store as number list
+//TODO: How can I out put all the item in num list
+//error: 
+
+const CheckAvalibleIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'CheckAvalible';
+    },
+    handle(handlerInput) {
+        return new Promise((resolve,reject)=>{
+            //resolve the user name 
+            const name  = sessionAttributes.signin_Name;
+            let speakOutput;
+            //const speakOutput =  "Here is the task that avalable to you :";
+            queryworkers.getWorkerByName(name,the_worker =>{
+                if (the_worker){
+                    //I have put workerid here because I don't know how to output a list , so just let the dabatabse things work!
+                    speakOutput = "Here is the task that avalable to you : "+the_worker.workerid;
+                }else{
+                    speakOutput = "I can find your name with " + name;
+                }
+                reprompt = "what are you going to do next?";
+                const response = handlerInput.responseBuilder
+                    .speak(speakOutput)
+                    .reprompt(reprompt)
+                    .withSimpleCard(name,speakOutput)
+                    .getResponse();
+                resolve(response);
+                return;
+            })
+        })
+    },
+}
+
 const HelpIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
@@ -139,7 +199,7 @@ exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
         SignInIntentHandler,
-        //CheckAvalibleIntentHandler,
+        CheckAvalibleIntentHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler,
