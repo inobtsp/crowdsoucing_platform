@@ -12,14 +12,14 @@ const {
 } = require('ask-sdk-core');
 
 //load the file that can query the workers status based on the name
-const getworkers = require("../queryworkers")
+const getworkers = require("queryworkers");
 // Load the AWS SDK for Node.js
-const AWS = require('aws-sdk');
+//const AWS = require('aws-sdk');
 // Set the region 
-AWS.config.update({region: 'REGION'});
+//AWS.config.update({region: 'REGION'});
 
 // Create the DynamoDB service object
-var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+//var ddb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 
 
 const LaunchRequestHandler = {
@@ -95,15 +95,17 @@ const CheckAvalibleIntentHandler = {
     handle(handlerInput) {
         return new Promise((resolve,reject)=>{
             //resolve the user name 
-            const name  = sessionAttributes.signin_Name;
+            const sessionAttribute = handlerInput.attributesManager.getSessionAttributes();
+            const name  = sessionAttribute.signin_Name;
+            let lowername =name.toLowerCase();
             let speakOutput;
             //const speakOutput =  "Here is the task that avalable to you :";
-            queryworkers.getWorkerByName(name,the_worker =>{
+            getworkers.getWorkerByName(lowername,the_worker =>{
                 if (the_worker){
                     //I have put workerid here because I don't know how to output a list , so just let the dabatabse things work!
                     speakOutput = "Here is the task that avalable to you : "+the_worker.workerid;
                 }else{
-                    speakOutput = "I can find your name with " + name;
+                    speakOutput = "I can't find your name with " + lowername;
                 }
                 reprompt = "what are you going to do next?";
                 const response = handlerInput.responseBuilder

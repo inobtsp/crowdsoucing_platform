@@ -18,7 +18,7 @@ module.exports = {
                 //"#workerID" : "workerid",
                 "#workerName" : "workername"
             },
-            ExpressionAttributeNames: {
+            ExpressionAttributeValues: {
                 //":ids": "0002",
                 ":signin_workername": name
             },
