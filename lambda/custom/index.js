@@ -13,6 +13,7 @@ const {
 
 //load the file that can query the workers status based on the name
 const getworkers = require("queryworkers");
+const insertworkers = require("insertworkers");
 // Load the AWS SDK for Node.js
 //const AWS = require('aws-sdk');
 // Set the region 
@@ -48,37 +49,47 @@ const SignInIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SignInIntent';
     },
     handle(handlerInput) {
-       const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        return new Promise((resolve,reject)=>{
+            //resolve the user name 
+            const sessionAttribute = handlerInput.attributesManager.getSessionAttributes();
+            var workersname= getSlotValue(handlerInput.requestEnvelope, 'workername');
+            sessionAttributes.signin_Name = workersname;
+            handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+            let lowername =workersname.toLowerCase();
+            //const speakOutput =  'Hi' +sessionAttributes.signin_Name;
+            insertworkers.insertByName(lowername,the_worker =>{
+                if (the_worker){
+                    //I have put workerid here because I don't know how to output a list , so just let the dabatabse things work!
+                    speakOutput = 'Hi' +sessionAttributes.signin_Name;
+                }else{
+                    speakOutput = "There's error when insert into database " ;
+                }
+                reprompt = "what your name again?";
+                const response = handlerInput.responseBuilder
+                    .speak(speakOutput)
+                    .reprompt(reprompt)
+                    .withSimpleCard(name,speakOutput)
+                    .getResponse();
+                resolve(response);
+                return;
+            
+            })
+        })
+     
+    }
+};
+
+
+ /* const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
        var workersname= getSlotValue(handlerInput.requestEnvelope, 'workername');
        sessionAttributes.signin_Name = workersname;
        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-        const speakOutput =  'Hi' +sessionAttributes.signin_Name;
-
-       /*var params = {
-            TableName: 'worker',
-            Item: {
-              'workername' : {N: '0002'},
-              'workerid' : {S: sessionAttributes.signin_Name},
-              'task_complete':{L:[ { "N" : "1" }, { "N" : "2" }, { "N" : "3" }, { "N" : "4" }, { "N" : "5" }, { "N" : "6" } ]},
-              'task_incomplete':{L:[]}
-            }
-          };
-
-          // Call DynamoDB to add the item to the table
-          ddb.putItem(params, function(err, data) {
-            if (err) {
-              console.log("Error", err);
-            } else {
-              console.log("Success", data);
-            }
-          });*/
+       const speakOutput =  'Hi' +sessionAttributes.signin_Name;
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
             .reprompt('what do you want? Check task? Do task?')
-            .getResponse();
-    }
-};
+            .getResponse();*/
 
 
 //check avalble task for the signin user
@@ -117,8 +128,8 @@ const CheckAvalibleIntentHandler = {
                 return;
             })
         })
-    },
-}
+    }
+};
 
 const HelpIntentHandler = {
     canHandle(handlerInput) {
