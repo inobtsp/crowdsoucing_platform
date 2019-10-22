@@ -1,102 +1,72 @@
-
+"use strict"
 const AWS = require("aws-sdk");
+const uuid = require('uuid');
 //const dynamodb = new AWS.DynamoDB();
+
 
 //config the region
 AWS.config.update({ region: 'us-east-1'});
 const dynamodb = new AWS.DynamoDB.DocumentClient({
     region: 'us-east-1'
    });
-   
-var uuid = require('uuid');
+
+
+
+let taskiid = uuid.v1();
+console.log(taskiid);
 module.exports = {
-    insertByName : function(name,callback){
+    insertByName : function(workername,callback){
         //paras set set the query, query by worker name
-        dynamodb.putItem({
+        dynamodb.put({
             TableName: "theworker",
-            Item: {
-                "task_progress": {
-                  "L": [
+            Item:{
+                "task_progress": 
+                  [
                     {
-                      "M": {
-                        "task_id": {
-                          "S": "001"
-                        },
-                        "task_status": {
-                          "S": "incomplete"
-                        }
-                      }
+                        "task_id":  "1",
+                        "task_status": "incomplete"
                     },
                     {
-                      "M": {
-                        "task_id": {
-                          "S": "002"
-                        },
-                        "task_status": {
-                          "S": "incomplete"
-                        }
-                      }
+                      
+                        "task_id": "2", 
+                        "task_status": "incomplete"
+
                     },
                     {
-                      "M": {
-                        "task_id": {
-                          "S": "003"
-                        },
-                        "task_status": {
-                          "S": "incomplete"
-                        }
-                      }
+                    
+                        "task_id": "3",
+                        "task_status": "incomplete"
+                        
                     },
                     {
-                      "M": {
-                        "task_id": {
-                          "S": "004"
-                        },
-                        "task_status": {
-                          "S": "incomplete"
-                        }
-                      }
+                     
+                        "task_id": "4",
+                        "task_status": "incomplete"
+
                     },
                     {
-                      "M": {
-                        "task_id": {
-                          "S": "005"
-                        },
-                        "task_status": {
-                          "S": "incoplete"
-                        }
-                      }
+                    
+                        "task_id":"5",
+                        "task_status":"incoplete"
+
                     },
                     {
-                      "M": {
-                        "task_status": {
-                          "S": "incomplete"
-                        },
-                        "taskd_id": {
-                          "S": "006"
-                        }
-                      }
+                      "task_id": "6",
+                      "task_status":"incomplete"
+                        
+                 
                     },
                     {
-                      "M": {
-                        "task_id": {
-                          "S": "007"
-                        },
-                        "task_status": {
-                          "S": "incomplete"
-                        }
-                      }
+                    
+                        "task_id": "7",
+                        "task_status": "incomplete"
+                    
                     }
-                  ]
-                },
-                "workerid": {
-                  "S": uuid.v1
-                },
-                "workername": {
-                  "S": name
-                }
-              },
-    
+                  ],
+                "workerid": taskiid,
+                "workername": workername
+              }
+            
         },
         (err,data)=>{
             if(err||data ==undefined){

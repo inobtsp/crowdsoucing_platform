@@ -1,4 +1,4 @@
-
+"use strict"
 const AWS = require("aws-sdk");
 //const dynamodb = new AWS.DynamoDB();
 
@@ -13,7 +13,8 @@ module.exports = {
     getWorkerByName : function(name,callback){
         //paras set set the query, query by worker name
         dynamodb.query({
-            TableName: "workers",
+            TableName: "theworker",
+            IndexName:"workername-index",
             ExpressionAttributeNames: {
                 //"#workerID" : "workerid",
                 "#workerName" : "workername"

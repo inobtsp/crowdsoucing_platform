@@ -40,6 +40,13 @@
                         "check my avalible task",
                         "what task I can do"
                     ]
+                },
+                {
+                    "name": "startquestionIntent",
+                    "slots": [],
+                    "samples": [
+                        "start my question"     
+                    ]
                 }
             ],
             "types": []

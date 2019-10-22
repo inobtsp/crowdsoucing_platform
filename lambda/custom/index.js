@@ -12,8 +12,9 @@ const {
 } = require('ask-sdk-core');
 
 //load the file that can query the workers status based on the name
-const getworkers = require("queryworkers");
 const insertworkers = require("insertworkers");
+const getworkers = require("queryworkers");
+
 // Load the AWS SDK for Node.js
 //const AWS = require('aws-sdk');
 // Set the region 
@@ -51,24 +52,18 @@ const SignInIntentHandler = {
     handle(handlerInput) {
         return new Promise((resolve,reject)=>{
             //resolve the user name 
-            const sessionAttribute = handlerInput.attributesManager.getSessionAttributes();
+            const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
             var workersname= getSlotValue(handlerInput.requestEnvelope, 'workername');
-            sessionAttributes.signin_Name = workersname;
+            sessionAttributes.signin_Name = workersname.toLowerCase();
+            the_inser_same =  workersname.toLowerCase();
             handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-            let lowername =workersname.toLowerCase();
-            //const speakOutput =  'Hi' +sessionAttributes.signin_Name;
-            insertworkers.insertByName(lowername,the_worker =>{
-                if (the_worker){
-                    //I have put workerid here because I don't know how to output a list , so just let the dabatabse things work!
-                    speakOutput = 'Hi' +sessionAttributes.signin_Name;
-                }else{
-                    speakOutput = "There's error when insert into database " ;
-                }
+            insertworkers.insertByName(the_inser_same,intheworker =>{
+                speakOutput = 'Hi' +sessionAttributes.signin_Name;
                 reprompt = "what your name again?";
                 const response = handlerInput.responseBuilder
                     .speak(speakOutput)
                     .reprompt(reprompt)
-                    .withSimpleCard(name,speakOutput)
+                    .withSimpleCard(the_inser_same,speakOutput)
                     .getResponse();
                 resolve(response);
                 return;
@@ -113,8 +108,20 @@ const CheckAvalibleIntentHandler = {
             //const speakOutput =  "Here is the task that avalable to you :";
             getworkers.getWorkerByName(lowername,the_worker =>{
                 if (the_worker){
-                    //I have put workerid here because I don't know how to output a list , so just let the dabatabse things work!
-                    speakOutput = "Here is the task that avalable to you : "+the_worker.workerid;
+                
+                    var templist  = [];
+                    console.log(the_worker.task_progress)
+                    for(item in the_worker.task_progress)
+                    {
+                        if(item.task_status == "incomplete")
+                        {
+                            templist.push(item.task_id);
+
+                        }
+                    }
+                    console.log(templist);
+                    taskstring  = templist.join();
+                    speakOutput = "Here is the task that avalable to you : "+ taskstring;
                 }else{
                     speakOutput = "I can't find your name with " + lowername;
                 }
@@ -131,6 +138,35 @@ const CheckAvalibleIntentHandler = {
     }
 };
 
+const StartquestionIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StartquestionIntent';
+    },
+    handle(handlerInput) {
+        return new Promise((resolve,reject)=>{
+            //resolve the user name 
+            const sessionAttribute = handlerInput.attributesManager.getSessionAttributes();
+            const name  = sessionAttribute.signin_Name;
+            let lowername =name.toLowerCase();
+            let speakOutput;
+            
+            insertworkers.insertByName(the_inser_same,intheworker =>{
+                speakOutput = 'Hi' +sessionAttributes.signin_Name;
+                reprompt = "what your name again?";
+                const response = handlerInput.responseBuilder
+                    .speak(speakOutput)
+                    .reprompt(reprompt)
+                    .withSimpleCard(the_inser_same,speakOutput)
+                    .getResponse();
+                resolve(response);
+                return;
+            
+            })
+        })
+     
+    }
+};
 const HelpIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
@@ -213,6 +249,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         LaunchRequestHandler,
         SignInIntentHandler,
         CheckAvalibleIntentHandler,
+        StartquestionIntentHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler,
