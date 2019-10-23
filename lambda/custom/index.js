@@ -113,9 +113,9 @@ const CheckAvalibleIntentHandler = {
                     console.log(the_worker.task_progress)
                     for(item in the_worker.task_progress)
                     {
-                        if(item.task_status == "incomplete")
+                        if(the_worker.task_progress[item].task_status == "incomplete")
                         {
-                            templist.push(item.task_id);
+                            templist.push(the_worker.task_progress[item].task_id);
 
                         }
                     }
