@@ -43,13 +43,150 @@
                 },
                 {
                     "name": "startquestionIntent",
-                    "slots": [],
+                    "slots": [
+                        {
+                            "name": "number",
+                            "type": "AMAZON.NUMBER"
+                        }
+                    ],
                     "samples": [
-                        "start my question"     
+                        "do task {number}",
+                        "I want to do task {number}",
+                        "start question {number}"
+                    ]
+                },
+                {
+                    "name": "YesOrNoanswerIntent",
+                    "slots": [
+                        {
+                            "name": "YesOrNo",
+                            "type": "YesOrNo"
+                        }
+                    ],
+                    "samples": [
+                        "{YesOrNo}",
+                        "I think {YesOrNo}"
+                        
+                    ]
+                },
+                {
+                    "name": "FactGatherIntent",
+                    "slots": [
+                        {
+                            "name": "yearslot",
+                            "type": "AMAZON.FOUR_DIGIT_NUMBER"
+                        }
+                    ],
+                    "samples": [
+                        "{yearslot}",
+                        "In {yearslot}"
+                    ]
+                },
+                {
+                    "name": "TranscriptionIntent",
+                    "slots": [
+                        {
+                            "name": "transcripslot",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": []
+                }
+            ],
+            "types": [
+                {
+                    "name": "YesOrNo",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "neutral"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "negative"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "positive"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "no"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "yes"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "dialog": {
+            "intents": [
+                {
+                    "name": "YesOrNoanswerIntent",
+                    "confirmationRequired": true,
+                    "prompts": {
+                        "confirmation": "Confirm.Intent.1350406825038"
+                    },
+                    "slots": [
+                        {
+                            "name": "YesOrNo",
+                            "type": "YesOrNo",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {}
+                        }
+                    ]
+                },
+                {
+                    "name": "FactGatherIntent",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "yearslot",
+                            "type": "AMAZON.FOUR_DIGIT_NUMBER",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {},
+                            "validations": [
+                                {
+                                    "type": "isLessThan",
+                                    "prompt": "Slot.Validation.751698031382.96838433018.1024035057220",
+                                    "value": "2020"
+                                }
+                            ]
+                        }
                     ]
                 }
             ],
-            "types": []
-        }
+            "delegationStrategy": "ALWAYS"
+        },
+        "prompts": [
+            {
+                "id": "Slot.Validation.751698031382.96838433018.1024035057220",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Ok"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent.1350406825038",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Your answer is {YesOrNo} , is that right?"
+                    }
+                ]
+            }
+        ]
     }
 }

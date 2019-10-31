@@ -30,7 +30,7 @@
         },
         "interactionModel": {
           "en-US": {
-            "eTag": "3b5898b9f7fa9bdf9bd9328f0d11c09c"
+            "eTag": "3afa4eded2a501cd3d79073d73798914"
           }
         },
         "lambda": [
@@ -43,7 +43,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-crowdsourcing_platform-default",
             "handler": "index.handler",
-            "revisionId": "4d411a31-1801-4a66-b37e-22890a4281d2",
+            "revisionId": "55c1a331-28a0-4898-bf53-78c52b1d6173",
             "runtime": "nodejs8.10"
           }
         ]

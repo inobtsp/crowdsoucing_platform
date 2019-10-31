@@ -10,11 +10,19 @@ const {
   getSlotValue,
   getDialogState,
 } = require('ask-sdk-core');
+const states = {
+    START: `_START`,
+    QUIZ: `_QUIZ`,
+  };
+  
+
 
 //load the file that can query the workers status based on the name
 const insertworkers = require("insertworkers");
 const getworkers = require("queryworkers");
-
+const proptfirstQuestion = require("querysubtask_byorderandtaskid");
+const insertanswers = require("insertanswers");
+const uuids = require('uuid');
 // Load the AWS SDK for Node.js
 //const AWS = require('aws-sdk');
 // Set the region 
@@ -55,10 +63,13 @@ const SignInIntentHandler = {
             const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
             var workersname= getSlotValue(handlerInput.requestEnvelope, 'workername');
             sessionAttributes.signin_Name = workersname.toLowerCase();
+            sessionAttributes.current_order = 1;
+            sessionAttributes.states = states.START;
             the_inser_same =  workersname.toLowerCase();
             handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
             insertworkers.insertByName(the_inser_same,intheworker =>{
-                speakOutput = 'Hi' +sessionAttributes.signin_Name;
+                console.log(intheworker);
+                speakOutput = "Hi! " +"<break time='1s'/>" +sessionAttributes.signin_Name + " "+sessionAttributes.current_order;
                 reprompt = "what your name again?";
                 const response = handlerInput.responseBuilder
                     .speak(speakOutput)
@@ -102,12 +113,16 @@ const CheckAvalibleIntentHandler = {
         return new Promise((resolve,reject)=>{
             //resolve the user name 
             const sessionAttribute = handlerInput.attributesManager.getSessionAttributes();
+            
             const name  = sessionAttribute.signin_Name;
             let lowername =name.toLowerCase();
             let speakOutput;
             //const speakOutput =  "Here is the task that avalable to you :";
             getworkers.getWorkerByName(lowername,the_worker =>{
+                sessionAttribute.current_workerid = the_worker.workerid;
+                handlerInput.attributesManager.setSessionAttributes(sessionAttribute);
                 if (the_worker){
+                    
                 
                     var templist  = [];
                     console.log(the_worker.task_progress)
@@ -129,7 +144,7 @@ const CheckAvalibleIntentHandler = {
                 const response = handlerInput.responseBuilder
                     .speak(speakOutput)
                     .reprompt(reprompt)
-                    .withSimpleCard(name,speakOutput)
+                    .withSimpleCard(lowername,speakOutput)
                     .getResponse();
                 resolve(response);
                 return;
@@ -138,26 +153,42 @@ const CheckAvalibleIntentHandler = {
     }
 };
 
+//say "start question one to enter"
 const StartquestionIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StartquestionIntent';
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'startquestionIntent';
     },
     handle(handlerInput) {
         return new Promise((resolve,reject)=>{
-            //resolve the user name 
-            const sessionAttribute = handlerInput.attributesManager.getSessionAttributes();
-            const name  = sessionAttribute.signin_Name;
-            let lowername =name.toLowerCase();
-            let speakOutput;
+            //nachu task id 存进session
+         
+
+
+            const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+            var current_taskid= getSlotValue(handlerInput.requestEnvelope, 'number');
+            sessionAttributes.current_taskid = current_taskid;
+            sessionAttributes.states = states.QUIZ;
             
-            insertworkers.insertByName(the_inser_same,intheworker =>{
-                speakOutput = 'Hi' +sessionAttributes.signin_Name;
-                reprompt = "what your name again?";
+            var order = sessionAttributes.current_order;
+
+           //从database里拿问题
+
+           proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,order,the_first_questions=>{
+                console.log("This is the order before ask question: " + order);
+                console.log("Now in the start the first question intent!! ")
+                console.log(the_first_questions); 
+                
+                speakOutput = "Here is the question"+ order+": "+"<break time='1s'/>"+ "Please answer " + the_first_questions.subtaskname +"or say repeat to repeat the question !"
+                +"<break time='2s'/>"+ the_first_questions.description;
+                reprompt = the_first_questions.description;
+                //order变成2
+                //sessionAttributes.current_order +=1;
+                handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                console.log("This is the order after ask question:" +sessionAttributes.current_order);
                 const response = handlerInput.responseBuilder
                     .speak(speakOutput)
                     .reprompt(reprompt)
-                    .withSimpleCard(the_inser_same,speakOutput)
                     .getResponse();
                 resolve(response);
                 return;
@@ -167,6 +198,130 @@ const StartquestionIntentHandler = {
      
     }
 };
+
+const YesOrNoanswerIntentHandler = {
+    
+    canHandle(handlerInput) {
+       // const attributes = handlerInput.attributesManager.getSessionAttributes();
+        //const request = handlerInput.requestEnvelope.request;
+        console.log("In the yesOrNo inttent");
+       /* return attributes.state === states.QUIZ && attributes.current_taskid === "1" &&request.getRequestType === 'IntentRequest'
+            && request.intentName === 'YesOrNoanswerIntent';*/
+            return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'YesOrNoanswerIntent'// && attributes.state === states.QUIZ && attributes.current_taskid === "1" ;
+    },
+    handle(handlerInput) {
+        return new Promise((resolve,reject)=>{
+        /*1. 拿slot value
+        2. 对比slot value的答案和正确的答案
+         3. 拿order=2 task=1的问题抛出来*/
+            const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+            const current_taskid = sessionAttributes.current_taskid;
+            var current_answer= getSlotValue(handlerInput.requestEnvelope, 'YesOrNo');
+            var order = sessionAttributes.current_order;
+          
+                    
+                //找到order 1 的全部信息
+            proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,order,the_query_sub_task=>{
+                
+        
+                var current_correction = compareSlots(current_answer,the_query_sub_task.correct_answer);
+                //存进answer
+                console.log("Store answer in the answer table start");
+                let answerid = uuids.v4();
+                insertanswers.insertInAnswer(answerid,sessionAttributes.current_workerid,sessionAttributes.signin_Name,the_query_sub_task.subtaskId,sessionAttributes.current_taskid,current_correction);
+                console.log("Store answer in the answer table end");
+                //move to next questions
+                sessionAttributes.current_order +=1;
+                handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                var neworder = sessionAttributes.current_order;
+              
+                //找到order 2 的全部信息并问下一个问题
+                proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,neworder,the_second_query_sub_task=>{
+                    
+                    console.log("Here's come's to asking the second function, the order is already plus one, current order is " +sessionAttributes.current_order);
+                    speakOutput = "Here is the question"+ sessionAttributes.current_order+": "+"<break time='1s'/>"+ "Please answer " + the_second_query_sub_task.subtaskname +"or say repeat to repeat the question !"
+                    +"<break time='2s'/>"+ the_second_query_sub_task.description;
+                    reprompt = the_second_query_sub_task.description;   
+                    const response = handlerInput.responseBuilder
+                        .speak(speakOutput)
+                        .reprompt(reprompt)
+                        .getResponse();
+                    resolve(response);
+                    return;
+
+
+                    
+                })      
+    
+            })
+            
+        })
+            
+        
+        
+    }
+};
+
+
+
+function compareSlots(slots, value) {
+    const correction = {
+        CORRECT: `correct`,
+        INCORRECT: `incorrect`,
+      };
+      
+
+     
+        if (slots.toString().toLowerCase() === value.toString().toLowerCase()) {
+          return correction.CORRECT;
+        }
+      
+    
+  
+    return correction.INCORRECT;
+  }
+
+/*const TranscriptionIntentHandler = {
+    canHandle(handlerInput) {
+        console.log("In the transcription inttent");
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'TranscriptionIntent';
+           
+    },
+    handle(handlerInput) {
+      /*  return new Promise((resolve,reject)=>{
+            //resolve the user name 
+           
+           
+                speakOutput
+                reprompt = "what are you going to do next?";
+                handlerInput.responseBuilder
+                    .speak(speakOutput)
+                    .reprompt(reprompt)
+                    .getResponse();
+                 
+        
+       
+        })
+        const speakOutput = 'You can say hello to me! How can I help?';
+
+        return handlerInput.responseBuilder
+            .speak(speakOutput)
+            .reprompt(speakOutput)
+            .getResponse();
+    }
+};
+
+*/
+
+
+
+
+
+
+
+
 const HelpIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
@@ -241,6 +396,8 @@ const ErrorHandler = {
     }
 };
 
+
+
 // The SkillBuilder acts as the entry point for your skill, routing all request and response
 // payloads to the handlers above. Make sure any new handlers or interceptors you've
 // defined are included below. The order matters - they're processed top to bottom.
@@ -250,6 +407,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         SignInIntentHandler,
         CheckAvalibleIntentHandler,
         StartquestionIntentHandler,
+        YesOrNoanswerIntentHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler,
