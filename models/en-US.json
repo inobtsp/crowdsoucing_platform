@@ -75,9 +75,25 @@
                         {
                             "name": "yearslot",
                             "type": "AMAZON.FOUR_DIGIT_NUMBER"
+                        },
+                        {
+                            "name": "city",
+                            "type": "AMAZON.City"
+                        },
+                        {
+                            "name": "familyname",
+                            "type": "AMAZON.GB_FIRST_NAME"
+                        },
+                        {
+                            "name": "sportsname",
+                            "type": "AMAZON.Sport"
                         }
                     ],
                     "samples": [
+                        "{sportsname}",
+                        "{familyname}",
+                        "It's {city}",
+                        "{city}",
                         "{yearslot}",
                         "In {yearslot}"
                     ]

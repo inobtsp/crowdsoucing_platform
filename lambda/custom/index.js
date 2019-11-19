@@ -38,7 +38,7 @@ const LaunchRequestHandler = {
     },
     handle(handlerInput) {
         
-        const speakOutput = 'Welcome come to crowdsoucing platform, sign in your name to do the following step!';
+        const speakOutput = 'Welcome come to crowdsoucing platform on desktop, sign in your name to do the following step!';
         return handlerInput.responseBuilder
             .speak(speakOutput)
             .reprompt(speakOutput)
@@ -178,7 +178,6 @@ const StartquestionIntentHandler = {
                 console.log("This is the order before ask question: " + order);
                 console.log("Now in the start the first question intent!! ")
                 console.log(the_first_questions); 
-                
                 speakOutput = "Here is the question"+ order+": "+"<break time='1s'/>"+ "Please answer " + the_first_questions.subtaskname +"or say repeat to repeat the question !"
                 +"<break time='2s'/>"+ the_first_questions.description;
                 reprompt = the_first_questions.description;
@@ -212,23 +211,120 @@ const YesOrNoanswerIntentHandler = {
     },
     handle(handlerInput) {
         return new Promise((resolve,reject)=>{
-        /*1. 拿slot value
-        2. 对比slot value的答案和正确的答案
-         3. 拿order=2 task=1的问题抛出来*/
+        //1. 拿slot value
+        //2. 对比slot value的答案和正确的答案
+         //3. 拿order=2 task=1的问题抛出来
+
             const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
             const current_taskid = sessionAttributes.current_taskid;
             var current_answer= getSlotValue(handlerInput.requestEnvelope, 'YesOrNo');
             var order = sessionAttributes.current_order;
           
+            if(order<2){
+                //找到order 1 的全部信息
+                //find column of the order i
+                proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,order,the_query_sub_task=>{
                     
+            
+                    var current_correction = compareSlots(current_answer,the_query_sub_task.correct_answer);
+                    //存进answer
+                    console.log("Store answer in the answer table start");
+                    let answerid = uuids.v4();
+                    insertanswers.insertInAnswer(answerid,sessionAttributes.current_workerid,sessionAttributes.signin_Name,the_query_sub_task.subtaskId,sessionAttributes.current_taskid,current_correction);
+                    console.log("Store answer in the answer table end");
+                    //move to next questions
+                    sessionAttributes.current_order +=1;
+                    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                    var neworder = sessionAttributes.current_order;
+                
+                    //找到order 2 的全部信息并问下一个问题
+                    //find the column of i+1 question and ask for the i+2
+                    proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,neworder,the_second_query_sub_task=>{
+                        console.log("Here's come's to asking the second function, the order is already plus one, current order is " +sessionAttributes.current_order);
+                        speakOutput = "Here is the question"+ sessionAttributes.current_order+": "+"<break time='1s'/>"+ "Please answer " + the_second_query_sub_task.subtaskname +"or say repeat to repeat the question !"
+                        +"<break time='2s'/>"+ the_second_query_sub_task.description;
+                        reprompt = the_second_query_sub_task.description;   
+                        const response = handlerInput.responseBuilder
+                            .speak(speakOutput)
+                            .reprompt(reprompt)
+                            .getResponse();
+                        resolve(response);
+                        return;
+                    })      
+        
+                })
+                
+            }else{
+                //if there are no quiz for task1 , the intent will tell user it's over and ask user to ask for new task.
+                //it will set order back to one and change the current state since quiz is over
+                speakOutput = "you are finish this task, which task are you going to do next!";
+                reprompt  = "tell me which task you are want to do";
+                sessionAttributes.current_order = 1;
+                sessionAttributes.states = states.START;
+                const response = handlerInput.responseBuilder
+                            .speak(speakOutput)
+                            .reprompt(reprompt)
+                            .getResponse();
+                        resolve(response);
+                        return;
+            }    
+    
+            
+        })
+            
+        
+        
+    }
+};
+
+
+
+
+
+const FactGatherIntentHandler = {
+    
+    canHandle(handlerInput) {
+        console.log("In the fact gather inttent");
+            return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'FactGatherIntent'// && attributes.state === states.QUIZ && attributes.current_taskid === "1" ;
+    },
+    handle(handlerInput) {
+        return new Promise((resolve,reject)=>{
+        //1. 拿slot value
+        //2. 对比slot value的答案和正确的答案
+         //3. 拿order=2 task=1的问题抛出来
+            const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+            const current_taskid = sessionAttributes.current_taskid;
+            var current_answer_year= getSlotValue(handlerInput.requestEnvelope, 'yearslot');
+            var current_answer_city= getSlotValue(handlerInput.requestEnvelope, 'city');
+            var current_answer_name= getSlotValue(handlerInput.requestEnvelope, 'familyname');
+            var current_answer_sports= getSlotValue(handlerInput.requestEnvelope, 'sportsname');
+            var order = sessionAttributes.current_order;
+          //---------------Todo----------------------//
+            //will alexa direct to the correct slot I designed?
+            //why not just use one dummy value to handle all solution     ???  
+            
+            
+
+    
+
+
+
+
+
+
+
+            //---------------Todo----------------------//     
                 //找到order 1 的全部信息
             proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,order,the_query_sub_task=>{
                 
-        
-                var current_correction = compareSlots(current_answer,the_query_sub_task.correct_answer);
-                //存进answer
+                //check the correction of the answer back end
+                var current_correction = compareSlots(current_answer_city,the_query_sub_task.correct_answer);
+     
                 console.log("Store answer in the answer table start");
+                //generate unique answerid
                 let answerid = uuids.v4();
+                //insert the answer provided by the user
                 insertanswers.insertInAnswer(answerid,sessionAttributes.current_workerid,sessionAttributes.signin_Name,the_query_sub_task.subtaskId,sessionAttributes.current_taskid,current_correction);
                 console.log("Store answer in the answer table end");
                 //move to next questions
@@ -265,6 +361,12 @@ const YesOrNoanswerIntentHandler = {
 
 
 
+
+
+
+
+
+
 function compareSlots(slots, value) {
     const correction = {
         CORRECT: `correct`,
@@ -276,9 +378,7 @@ function compareSlots(slots, value) {
         if (slots.toString().toLowerCase() === value.toString().toLowerCase()) {
           return correction.CORRECT;
         }
-      
-    
-  
+
     return correction.INCORRECT;
   }
 
@@ -408,6 +508,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         CheckAvalibleIntentHandler,
         StartquestionIntentHandler,
         YesOrNoanswerIntentHandler,
+        FactGatherIntentHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler,
