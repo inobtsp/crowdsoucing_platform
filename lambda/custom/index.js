@@ -38,7 +38,7 @@ const LaunchRequestHandler = {
     },
     handle(handlerInput) {
         
-        const speakOutput = 'Welcome come to crowdsoucing platform on desktop, sign in your name to do the following step!';
+        const speakOutput = 'Welcome come to crowdsoucing platform on laptop, sign in your name to do the following step!';
         return handlerInput.responseBuilder
             .speak(speakOutput)
             .reprompt(speakOutput)
@@ -133,6 +133,7 @@ const CheckAvalibleIntentHandler = {
                             templist.push(the_worker.task_progress[item].task_id);
 
                         }
+                        //what is the 
                     }
                     console.log(templist);
                     taskstring  = templist.join();
@@ -201,20 +202,27 @@ const StartquestionIntentHandler = {
 const YesOrNoanswerIntentHandler = {
     
     canHandle(handlerInput) {
-       // const attributes = handlerInput.attributesManager.getSessionAttributes();
-        //const request = handlerInput.requestEnvelope.request;
-        console.log("In the yesOrNo inttent");
-       /* return attributes.state === states.QUIZ && attributes.current_taskid === "1" &&request.getRequestType === 'IntentRequest'
-            && request.intentName === 'YesOrNoanswerIntent';*/
-            return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+        var attributes = handlerInput.attributesManager.getSessionAttributes();
+        var request = handlerInput.requestEnvelope.request;
+       
+        console.log(attributes.current_taskid);
+    var  A= attributes.state === states.QUIZ;
+    var B= attributes.current_taskid === "1" ;
+    var C = request.getRequestType === 'IntentRequest';
+       console.log(A + ""+B+""+C);
+       console.log( "the intent enter error1: " + attributes.state);
+       console.log( "the intent enter error2: " + request.getRequestType);
+       return true;
+           /* return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'YesOrNoanswerIntent'// && attributes.state === states.QUIZ && attributes.current_taskid === "1" ;
-    },
+ */   
+        },
     handle(handlerInput) {
         return new Promise((resolve,reject)=>{
         //1. 拿slot value
         //2. 对比slot value的答案和正确的答案
          //3. 拿order=2 task=1的问题抛出来
-
+            console.log("In the yesOrNo inttent");
             const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
             const current_taskid = sessionAttributes.current_taskid;
             var current_answer= getSlotValue(handlerInput.requestEnvelope, 'YesOrNo');
@@ -284,21 +292,27 @@ const YesOrNoanswerIntentHandler = {
 const FactGatherIntentHandler = {
     
     canHandle(handlerInput) {
-        console.log("In the fact gather inttent");
+        const attributes = handlerInput.attributesManager.getSessionAttributes();
+        const request = handlerInput.requestEnvelope.request;
+        
+        console.log(attributes.current_taskid);
+       return attributes.state === states.QUIZ && attributes.current_taskid === "2" &&request.getRequestType === 'IntentRequest'
+          ;
+       /* console.log("In the fact gather inttent");
             return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'FactGatherIntent'// && attributes.state === states.QUIZ && attributes.current_taskid === "1" ;
-    },
+    */
+        },
     handle(handlerInput) {
         return new Promise((resolve,reject)=>{
         //1. 拿slot value
         //2. 对比slot value的答案和正确的答案
          //3. 拿order=2 task=1的问题抛出来
+         console.log("In the gact gather inttent");
             const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
             const current_taskid = sessionAttributes.current_taskid;
-            var current_answer_year= getSlotValue(handlerInput.requestEnvelope, 'yearslot');
             var current_answer_city= getSlotValue(handlerInput.requestEnvelope, 'city');
-            var current_answer_name= getSlotValue(handlerInput.requestEnvelope, 'familyname');
-            var current_answer_sports= getSlotValue(handlerInput.requestEnvelope, 'sportsname');
+            
             var order = sessionAttributes.current_order;
           //---------------Todo----------------------//
             //will alexa direct to the correct slot I designed?

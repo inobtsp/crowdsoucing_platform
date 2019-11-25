@@ -44,6 +44,35 @@
             "functionName": "ask-custom-crowdsourcing_platform-default",
             "handler": "index.handler",
             "revisionId": "aeffe6dc-61e3-4d8c-9e7d-b22c3cc94321",
+            "runtime": "nodejs10.x"
+          }
+        ]
+      }
+    },
+    "dante2": {
+      "skill_id": "amzn1.ask.skill.9557fb95-6c84-4a94-9f7d-3c7568229c27",
+      "was_cloned": false,
+      "merge": {},
+      "resources": {
+        "manifest": {
+          "eTag": "723d52aaba467e518398db3e420257e6"
+        },
+        "interactionModel": {
+          "en-US": {
+            "eTag": "d4ffb294c8a223319e26d6344ef5de36"
+          }
+        },
+        "lambda": [
+          {
+            "alexaUsage": [
+              "custom/default"
+            ],
+            "arn": "arn:aws:lambda:us-east-1:043271782077:function:ask-custom-crowdsourcing_platform-default",
+            "awsRegion": "us-east-1",
+            "codeUri": "lambda/custom",
+            "functionName": "ask-custom-crowdsourcing_platform-default",
+            "handler": "index.handler",
+            "revisionId": "9b041def-cfe9-4421-800f-cbbfef5afaf1",
             "runtime": "nodejs8.10"
           }
         ]
