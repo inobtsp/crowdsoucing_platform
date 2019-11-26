@@ -66,36 +66,22 @@
                     "samples": [
                         "{YesOrNo}",
                         "I think {YesOrNo}"
-                        
                     ]
                 },
                 {
                     "name": "FactGatherIntent",
                     "slots": [
                         {
-                            "name": "yearslot",
-                            "type": "AMAZON.FOUR_DIGIT_NUMBER"
-                        },
-                        {
-                            "name": "city",
-                            "type": "AMAZON.City"
-                        },
-                        {
-                            "name": "familyname",
-                            "type": "AMAZON.GB_FIRST_NAME"
-                        },
-                        {
-                            "name": "sportsname",
-                            "type": "AMAZON.Sport"
+                            "name": "the_fact",
+                            "type": "AMAZON.SearchQuery"
                         }
                     ],
                     "samples": [
-                        "{sportsname}",
-                        "{familyname}",
-                        "It's {city}",
-                        "{city}",
-                        "{yearslot}",
-                        "In {yearslot}"
+                        "Is {the_fact}",
+                        "It's {the_fact}",
+                        "in {the_fact}",
+                        "On {the_fact}",
+                        "I think {the_fact} "
                     ]
                 },
                 {
@@ -162,22 +148,17 @@
                 },
                 {
                     "name": "FactGatherIntent",
-                    "confirmationRequired": false,
-                    "prompts": {},
+                    "confirmationRequired": true,
+                    "prompts": {
+                        "confirmation": "Confirm.Intent.660976665349"
+                    },
                     "slots": [
                         {
-                            "name": "yearslot",
-                            "type": "AMAZON.FOUR_DIGIT_NUMBER",
+                            "name": "the_fact",
+                            "type": "AMAZON.SearchQuery",
                             "confirmationRequired": false,
                             "elicitationRequired": false,
-                            "prompts": {},
-                            "validations": [
-                                {
-                                    "type": "isLessThan",
-                                    "prompt": "Slot.Validation.751698031382.96838433018.1024035057220",
-                                    "value": "2020"
-                                }
-                            ]
+                            "prompts": {}
                         }
                     ]
                 }
@@ -200,6 +181,15 @@
                     {
                         "type": "PlainText",
                         "value": "Your answer is {YesOrNo} , is that right?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent.660976665349",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Your answer is {the_fact} , Is that right?"
                     }
                 ]
             }
