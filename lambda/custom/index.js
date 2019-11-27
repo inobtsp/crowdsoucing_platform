@@ -249,7 +249,7 @@ const YesOrNoanswerIntentHandler = {
     
     canHandle(handlerInput) {
         var attributes = handlerInput.attributesManager.getSessionAttributes();
-
+        
         console.log(attributes.current_taskid);
         var  A= attributes.states === states.QUIZ;
         var B= attributes.current_taskid === "1" ;
@@ -288,13 +288,12 @@ const YesOrNoanswerIntentHandler = {
                     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
                     var neworder = sessionAttributes.current_order;
 
-                    if(the_query_sub_task){
                         
                        
                         //找到order 2 的全部信息并问下一个问题
                         //find the column of i+1 question and ask for the i+2
                         proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,neworder,the_second_query_sub_task=>{
-                            console.log("Here's come's to asking the second function, the order is already plus one, current order is " +sessionAttributes.current_order);
+                            if(the_second_query_sub_task){console.log("Here's come's to asking the second function, the order is already plus one, current order is " +sessionAttributes.current_order);
                             speakOutput = "Here is the question"+ sessionAttributes.current_order+": "+"<break time='1s'/>"+ "Please answer " + the_second_query_sub_task.subtaskname +"or say repeat to repeat the question !"
                             +"<break time='2s'/>"+ the_second_query_sub_task.description;
                             reprompt = the_second_query_sub_task.description;   
@@ -304,38 +303,43 @@ const YesOrNoanswerIntentHandler = {
                                 .getResponse();
                             resolve(response);
                             return;
-                    })              
-                    }
-                    else{
 
-                         //if there are no quiz for task1 , the intent will tell user it's over and ask user to ask for new task.
-                        //it will set order back to one and change the current state since quiz is over
-                 
-                        console.log("here the query sub task is invalid 22222222222222222222222");
-                        speakOutput = "you are finish this task, which task are you going to do next!";
-                        reprompt  = "tell me which task you are want to do";
-                        //mark task one as complete 
-                        sessionAttributes.current_order = 1;
-                        sessionAttributes.states = states.START;
-                        var list = sessionAttributes.current_task_progess;
-                        let change_status = list .find((p) => {
-                            return p.task_id === current_taskid;
-                        });
-                        change_status.task_status = "complete";
-                        sessionAttributes.current_task_progess = list;
-                        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-                        //mark task one as complete in database
-                        update_progress.update_the_progress(sessionAttributes.current_workerid,list);
-                        console.log("here change the status of task progress");
-                        const response = handlerInput.responseBuilder
-                                    .speak(speakOutput)
-                                    .reprompt(reprompt)
-                                    .getResponse();
-                                resolve(response);
-                                return;
                             }
-                        
-                
+                            else{
+                                   //if there are no quiz for task1 , the intent will tell user it's over and ask user to ask for new task.
+                                    //it will set order back to one and change the current state since quiz is over
+                            
+                                    console.log("here the query sub task is invalid 22222222222222222222222");
+                                    speakOutput = "you are finish this task, which task are you going to do next!";
+                                    reprompt  = "tell me which task you are want to do";
+                                    //mark task one as complete 
+                                    sessionAttributes.current_order = 1;
+                                    sessionAttributes.states = states.START;
+                                    var list = sessionAttributes.current_task_progess;
+                                    let change_status = list .find((p) => {
+                                        return p.task_id === current_taskid;
+                                    });
+                                    change_status.task_status = "complete";
+                                    sessionAttributes.current_task_progess = list;
+                                    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                                    //mark task one as complete in database
+                                    update_progress.update_the_progress(sessionAttributes.current_workerid,sessionAttributes.signin_Name,list,update_status=>{
+
+                                        console.log("here change the status of task progress");
+                                        const response = handlerInput.responseBuilder
+                                                    .speak(speakOutput)
+                                                    .reprompt(reprompt)
+                                                    .getResponse();
+                                                resolve(response);
+                                                return;
+
+                                    }
+                                )
+                               
+
+                                     }
+                            
+                                })                            
                         })
                 
         

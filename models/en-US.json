@@ -77,7 +77,7 @@
                         }
                     ],
                     "samples": [
-                        "Is {the_fact}",
+                        "In {the_fact}",
                         "It's {the_fact}",
                         "in {the_fact}",
                         "On {the_fact}",
