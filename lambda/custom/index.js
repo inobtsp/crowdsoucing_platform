@@ -41,7 +41,7 @@ const LaunchRequestHandler = {
     },
     handle(handlerInput) {
         
-        const speakOutput = 'Welcome come to crowdsoucing platform on desktop , sign in your name to do the following step!';
+        const speakOutput = 'Welcome come to crowdsoucing platform on desktop in china , sign in your name to do the following step!';
         return handlerInput.responseBuilder
             .speak(speakOutput)
             .reprompt(speakOutput)
@@ -211,22 +211,23 @@ const StartquestionIntentHandler = {
                 console.log("This is the order before ask question: " + order);
                 console.log("Now in the start the first question intent!! ")
                 console.log(the_first_questions); 
-                
+                practiceOutput = "The first two question are for you to pratice, the result will not recorded, the real question will start at question three";
                 if (current_taskid === "1"){
-                    speakOutput = "Here is the question"+ order+": "+"<break time='1s'/>"+ "Please answer " + the_first_questions.subtaskname +"or say repeat to repeat the question !"
+
+                    speakOutput = "Here is the question"+ order+": "+"<break time='1s'/>"+practiceOutput+ "<break time='1s'/>"+"Please answer " + the_first_questions.subtaskname +"or say repeat to repeat the question !"
                     +"<break time='2s'/>"+ the_first_questions.description;
                     console.log( "第一个if");
                 }
                 else if (current_taskid === "2")
                 {
-                    speakOutput = "Here is the question"+ order+ "on task " +current_taskid + ": "+"<break time='1s'/>"+ "Please answer " + the_first_questions.subtaskname +"or say repeat to repeat the question !"
+                    speakOutput = "Here is the question"+ order+ "on task " +current_taskid + ": "+"<break time='1s'/>"+practiceOutput+ "<break time='1s'/>"+ "Please answer " + the_first_questions.subtaskname +"or say repeat to repeat the question !"
                     +"<break time='2s'/>"+ the_first_questions.description;
                     console.log( "第二个if");
                 }
                 else{
                     speakOutput="here comes to third type!";
                 }
-
+                sessionAttributes.current_question_des =  the_first_questions.description;
                 reprompt = "your answer is invalid " +the_first_questions.description;
                 //order变成2
                 //sessionAttributes.current_order +=1;
@@ -244,6 +245,43 @@ const StartquestionIntentHandler = {
      
     }
 };
+
+const RepeatHandler = {
+    canHandle(handlerInput) {
+      console.log("Inside RepeatHandler");
+      var B= Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.RepeatIntent' ;
+      var C = Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest';
+      console.log("in repeat "+ " "+B+" "+C);
+  
+      return Alexa.getRequestType(handlerInput.requestEnvelope) ==='IntentRequest'&&
+             Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.RepeatIntent';
+    },
+    handle(handlerInput) {
+
+          return new Promise((resolve,reject)=>{
+            //resolve the user name 
+           
+           
+            console.log("Inside RepeatHandler - handle");
+            const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+            const question =sessionAttributes.current_question_des;
+            const speakOutput = question
+
+            
+            const response = handlerInput.responseBuilder
+            .speak(speakOutput)
+            .reprompt(reprompt)
+            .getResponse();
+        resolve(response);
+        return;
+  
+       
+        })
+
+
+    }
+  };
+
 
 const YesOrNoanswerIntentHandler = {
     
@@ -270,12 +308,18 @@ const YesOrNoanswerIntentHandler = {
             const current_taskid = sessionAttributes.current_taskid;
             var current_answer= getSlotValue(handlerInput.requestEnvelope, 'YesOrNo');
             var order = sessionAttributes.current_order;
+            var current_question_des;
                     
           
             
                 //找到order 1 的全部信息
                 //find column of the order i
                 proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,order,the_query_sub_task=>{
+
+
+                    //如果带practice则存进去
+                   
+                   if(the_query_sub_task.practice == false){
                     //存进answer
                     console.log("Store answer in the answer table start");
                     let answerid = uuids.v4();
@@ -283,6 +327,9 @@ const YesOrNoanswerIntentHandler = {
                     insertanswers.insertInAnswer(answerid,sessionAttributes.current_workerid,sessionAttributes.signin_Name,the_query_sub_task.subtaskId,sessionAttributes.current_taskid,current_correction);
                     console.log("Store answer in the answer table end");
                     console.log("here the query sub task is valiod 11111111111111111111");
+
+                   }
+                   
                     //move to next questions
                     sessionAttributes.current_order +=1;
                     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
@@ -293,9 +340,13 @@ const YesOrNoanswerIntentHandler = {
                         //找到order 2 的全部信息并问下一个问题
                         //find the column of i+1 question and ask for the i+2
                         proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,neworder,the_second_query_sub_task=>{
-                            if(the_second_query_sub_task){console.log("Here's come's to asking the second function, the order is already plus one, current order is " +sessionAttributes.current_order);
-                            speakOutput = "Here is the question"+ sessionAttributes.current_order+": "+"<break time='1s'/>"+ "Please answer " + the_second_query_sub_task.subtaskname +"or say repeat to repeat the question !"
+                            if(the_second_query_sub_task)
+                            {
+
+                                console.log("Here's come's to asking the second function, the order is already plus one, current order is " +sessionAttributes.current_order);
+                                speakOutput = "Here is the question"+ sessionAttributes.current_order+": "+"<break time='1s'/>"+ "Please answer " + the_second_query_sub_task.subtaskname +"or say repeat to repeat the question !"
                             +"<break time='2s'/>"+ the_second_query_sub_task.description;
+                            sessionAttributes.current_question_des =  the_second_query_sub_task.description;
                             reprompt = the_second_query_sub_task.description;   
                             const response = handlerInput.responseBuilder
                                 .speak(speakOutput)
@@ -335,8 +386,6 @@ const YesOrNoanswerIntentHandler = {
 
                                     }
                                 )
-                               
-
                                      }
                             
                                 })                            
@@ -351,8 +400,6 @@ const YesOrNoanswerIntentHandler = {
         
     }
 };
-
-
 
 
 
@@ -373,29 +420,42 @@ const FactGatherIntentHandler = {
         //1. 拿slot value
         //2. 对比slot value的答案和正确的答案
          //3. 拿order=2 task=1的问题抛出来
-         console.log("In the gact gather inttent");
+         console.log("In the gact gather intent");
             const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
             const current_taskid = sessionAttributes.current_taskid;
             var current_answer_fact= getSlotValue(handlerInput.requestEnvelope, 'the_fact');
             
             var order = sessionAttributes.current_order;
-   
+            //这里等于总题数减一，因为到2的时候还会再走一次这个intent
             if(order<=2){
                 //找到order 1 的全部信息
                 //find column of the order i
+
+
+              
                 proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,order,the_query_sub_task=>{
+                   
+                     
+                    if(order>1)
+                    {
+                            var current_correction = compareSlots(current_answer_fact,the_query_sub_task.correct_answer);
+                            //存进answer
+                            console.log("Store answer in the answer table start");
+                            let answerid = uuids.v4();
+                            insertanswers.insertInAnswer(answerid,sessionAttributes.current_workerid,sessionAttributes.signin_Name,the_query_sub_task.subtaskId,sessionAttributes.current_taskid,current_correction);
+                            console.log("Store answer in the answer table end");
+                        
+                            //move to next questions
+                            sessionAttributes.current_order +=1;
+                            handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                            var neworder = sessionAttributes.current_order;
+
+                    }       
+                        //move to next questions
+                        sessionAttributes.current_order +=1;
+                        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                        var neworder = sessionAttributes.current_order;
                     
-            
-                    var current_correction = compareSlots(current_answer_fact,the_query_sub_task.correct_answer);
-                    //存进answer
-                    console.log("Store answer in the answer table start");
-                    let answerid = uuids.v4();
-                    insertanswers.insertInAnswer(answerid,sessionAttributes.current_workerid,sessionAttributes.signin_Name,the_query_sub_task.subtaskId,sessionAttributes.current_taskid,current_correction);
-                    console.log("Store answer in the answer table end");
-                    //move to next questions
-                    sessionAttributes.current_order +=1;
-                    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-                    var neworder = sessionAttributes.current_order;
                 
                     //找到order 2 的全部信息并问下一个问题
                     //find the column of i+1 question and ask for the i+2
@@ -450,6 +510,7 @@ function compareSlots(slots, value) {
         INCORRECT: `incorrect`,
       };
 
+      
         if (slots.toString().toLowerCase() === value.toString().toLowerCase()) {
           return correction.CORRECT;
         }
@@ -489,6 +550,7 @@ function compareSlots(slots, value) {
 };
 
 */
+
 
 
 
@@ -582,8 +644,10 @@ exports.handler = Alexa.SkillBuilders.custom()
         SignInIntentHandler,
         CheckAvalibleIntentHandler,
         StartquestionIntentHandler,
+        RepeatHandler,
         YesOrNoanswerIntentHandler,
         FactGatherIntentHandler,
+        RepeatHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler,

@@ -8,6 +8,10 @@
                     "samples": []
                 },
                 {
+                    "name": "AMAZON.RepeatIntent",
+                    "samples": []
+                },
+                {
                     "name": "AMAZON.HelpIntent",
                     "samples": []
                 },
@@ -95,6 +99,7 @@
                     "samples": []
                 }
             ],
+            
             "types": [
                 {
                     "name": "YesOrNo",
@@ -132,7 +137,6 @@
             "intents": [
                 {
                     "name": "YesOrNoanswerIntent",
-                    "confirmationRequired": true,
                     "prompts": {
                         "confirmation": "Confirm.Intent.1350406825038"
                     },
@@ -148,7 +152,7 @@
                 },
                 {
                     "name": "FactGatherIntent",
-                    "confirmationRequired": true,
+
                     "prompts": {
                         "confirmation": "Confirm.Intent.660976665349"
                     },

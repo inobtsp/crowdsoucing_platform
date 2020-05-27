@@ -30,7 +30,7 @@
         },
         "interactionModel": {
           "en-US": {
-            "eTag": "2116d5b81ad692a7796ead4d8bda03e0"
+            "eTag": "7d5140eb1e83388cdff13190327e7630"
           }
         },
         "lambda": [
@@ -43,8 +43,8 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-crowdsourcing_platform-default",
             "handler": "index.handler",
-            "revisionId": "c311b8c8-fef8-4426-94b1-c18d85ac63ee",
-            "runtime": "nodejs8.10"
+            "revisionId": "1be5c6cf-6082-4625-bcf3-0eda7e26eea3",
+            "runtime": "nodejs12.x"
           }
         ]
       }
@@ -73,7 +73,7 @@
             "functionName": "ask-custom-crowdsourcing_platform-default",
             "handler": "index.handler",
             "revisionId": "249c6de7-e16f-43a4-a25d-02e15915cc1f",
-            "runtime": "nodejs8.10"
+            "runtime": "nodejs12.x"
           }
         ]
       }
