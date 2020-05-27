@@ -310,8 +310,6 @@ const YesOrNoanswerIntentHandler = {
             var order = sessionAttributes.current_order;
             var current_question_des;
                     
-          
-            
                 //找到order 1 的全部信息
                 //find column of the order i
                 proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,order,the_query_sub_task=>{
@@ -423,11 +421,104 @@ const FactGatherIntentHandler = {
          console.log("In the gact gather intent");
             const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
             const current_taskid = sessionAttributes.current_taskid;
-            var current_answer_fact= getSlotValue(handlerInput.requestEnvelope, 'the_fact');
-            
+            var current_answer_fact= getSlotValue(handlerInput.requestEnvelope, 'the_fact');    
+            var current_question_des;
             var order = sessionAttributes.current_order;
+
+
+
+
+            proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,order,the_query_sub_task=>{
+
+
+                //如果带practice则存进去
+               
+               if(the_query_sub_task.practice == false){
+                //存进answer
+                console.log("Store answer in the answer table start");
+                let answerid = uuids.v4();
+                var current_correction = compareSlots(current_answer,the_query_sub_task.correct_answer);
+                insertanswers.insertInAnswer(answerid,sessionAttributes.current_workerid,sessionAttributes.signin_Name,the_query_sub_task.subtaskId,sessionAttributes.current_taskid,current_correction);
+                console.log("Store answer in the answer table end");
+                console.log("here the query sub task is valiod 11111111111111111111");
+
+               }
+               
+                //move to next questions
+                sessionAttributes.current_order +=1;
+                handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                var neworder = sessionAttributes.current_order;
+
+                    
+                   
+                    //找到order 2 的全部信息并问下一个问题
+                    //find the column of i+1 question and ask for the i+2
+                    proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,neworder,the_second_query_sub_task=>{
+                        if(the_second_query_sub_task)
+                        {
+
+                            console.log("Here's come's to asking the second function, the order is already plus one, current order is " +sessionAttributes.current_order);
+                            speakOutput = "Here is the question"+ sessionAttributes.current_order+": "+"<break time='1s'/>"+ "Please answer " + the_second_query_sub_task.subtaskname +"or say repeat to repeat the question !"
+                        +"<break time='2s'/>"+ the_second_query_sub_task.description;
+                        sessionAttributes.current_question_des =  the_second_query_sub_task.description;
+                        reprompt = the_second_query_sub_task.description;   
+                        const response = handlerInput.responseBuilder
+                            .speak(speakOutput)
+                            .reprompt(reprompt)
+                            .getResponse();
+                        resolve(response);
+                        return;
+
+                        }
+                        else{
+                               //if there are no quiz for task1 , the intent will tell user it's over and ask user to ask for new task.
+                                //it will set order back to one and change the current state since quiz is over
+                        
+                                console.log("here the query sub task is invalid 22222222222222222222222");
+                                speakOutput = "you are finish this task, which task are you going to do next!";
+                                reprompt  = "tell me which task you are want to do";
+                                //mark task one as complete 
+                                sessionAttributes.current_order = 1;
+                                sessionAttributes.states = states.START;
+                                var list = sessionAttributes.current_task_progess;
+                                let change_status = list .find((p) => {
+                                    return p.task_id === current_taskid;
+                                });
+                                change_status.task_status = "complete";
+                                sessionAttributes.current_task_progess = list;
+                                handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                                //mark task one as complete in database
+                                update_progress.update_the_progress(sessionAttributes.current_workerid,sessionAttributes.signin_Name,list,update_status=>{
+
+                                    console.log("here change the status of task progress");
+                                    const response = handlerInput.responseBuilder
+                                                .speak(speakOutput)
+                                                .reprompt(reprompt)
+                                                .getResponse();
+                                            resolve(response);
+                                            return;
+
+                                }
+                            )
+                                 }
+                        
+                            })                            
+                    })
+            
+
+
+
+
+
+
+
+
+
+
+
+
             //这里等于总题数减一，因为到2的时候还会再走一次这个intent
-            if(order<=2){
+            /*if(order<=2){
                 //找到order 1 的全部信息
                 //find column of the order i
 
@@ -487,7 +578,7 @@ const FactGatherIntentHandler = {
                             .getResponse();
                         resolve(response);
                         return;
-            }    
+            } */   
             
         })
             
