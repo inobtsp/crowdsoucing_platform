@@ -41,7 +41,7 @@ const LaunchRequestHandler = {
     },
     handle(handlerInput) {
         
-        const speakOutput = 'Welcome come to crowdsoucing platform on desktop in china , sign in your name to do the following step!';
+        const speakOutput = 'Welcome come to crowdsoucing platform on desktop in taizhou , sign in your name to do the following step!';
         return handlerInput.responseBuilder
             .speak(speakOutput)
             .reprompt(speakOutput)
@@ -224,8 +224,20 @@ const StartquestionIntentHandler = {
                     +"<break time='2s'/>"+ the_first_questions.description;
                     console.log( "第二个if");
                 }
+                else if (current_taskid === "3")
+                {
+                    soundurl = '<audio  src="'+the_first_questions.description+'"/>' 
+                    speakOutput =  "Here is the question"+ order+": "+'<audio  src="'+the_first_questions.description+'"/>' + soundurl;
+                    //+ the_first_questions.description;
+                    //+ order+": "+'<audio  src="'+the_first_questions.description+'"/>' ;
+
+                    //<audio src = ' https://s3.amazonaws.com/dante.crowdsoucing.project/king.mp3' />
+                    console.log(speakOutput)
+                    console.log(the_first_questions.description);
+                    console.log( "第三个if");
+                }
                 else{
-                    speakOutput="here comes to third type!";
+                    speakOutput="here comes to Fourth type!";
                 }
                 sessionAttributes.current_question_des =  the_first_questions.description;
                 reprompt = "your answer is invalid " +the_first_questions.description;
@@ -245,7 +257,7 @@ const StartquestionIntentHandler = {
      
     }
 };
-
+/*
 const RepeatHandler = {
     canHandle(handlerInput) {
       console.log("Inside RepeatHandler");
@@ -282,7 +294,7 @@ const RepeatHandler = {
     }
   };
 
-
+*/
 const YesOrNoanswerIntentHandler = {
     
     canHandle(handlerInput) {
@@ -292,7 +304,7 @@ const YesOrNoanswerIntentHandler = {
         var  A= attributes.states === states.QUIZ;
         var B= attributes.current_taskid === "1" ;
         var C = Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest';
-       console.log(A + " "+B+" "+C);
+        console.log(A + " "+B+" "+C);
 
           return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'&& attributes.states === states.QUIZ && attributes.current_taskid === "1";
           //&& Alexa.getIntentName(handlerInput.requestEnvelope) === 'YesOrNoanswerIntent'
@@ -399,20 +411,50 @@ const YesOrNoanswerIntentHandler = {
     }
 };
 
+/*  
+        var attributes = handlerInput.attributesManager.getSessionAttributes();
+        
+        console.log(attributes.current_taskid);
+        var  A= attributes.states === states.QUIZ;
+        var B= attributes.current_taskid === "1" ;
+        var C = Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest';
+       console.log(A + " "+B+" "+C);
 
+          return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'&& attributes.states === states.QUIZ && attributes.current_taskid === "1";
+          //&& Alexa.getIntentName(handlerInput.requestEnvelope) === 'YesOrNoanswerIntent'
+*/
 
 const FactGatherIntentHandler = {
     
     canHandle(handlerInput) {
-        const attributes = handlerInput.attributesManager.getSessionAttributes();
+        /*const attributes = handlerInput.attributesManager.getSessionAttributes();
         
         console.log(attributes.current_taskid);
-       return attributes.states === states.QUIZ && attributes.current_taskid === "2" && Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' ;
+       return attributes.states === states.QUIZ && attributes.current_taskid === "2" && Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' ;*/
        /* console.log("In the fact gather inttent");
             return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'FactGatherIntent'// && attributes.state === states.QUIZ && attributes.current_taskid === "1" ;
     */
+
+
+
+            var attributes = handlerInput.attributesManager.getSessionAttributes();
+                    
+            console.log(attributes.current_taskid);
+            var  A= attributes.states === states.QUIZ;
+            var B= attributes.current_taskid === "2" ;
+            var C = Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest';
+            console.log(A + " "+B+" "+C);
+
+            return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'&& attributes.states === states.QUIZ && attributes.current_taskid === "2";
+
+
+
+
         },
+
+
+
     handle(handlerInput) {
         return new Promise((resolve,reject)=>{
         //1. 拿slot value
@@ -437,7 +479,7 @@ const FactGatherIntentHandler = {
                 //存进answer
                 console.log("Store answer in the answer table start");
                 let answerid = uuids.v4();
-                var current_correction = compareSlots(current_answer,the_query_sub_task.correct_answer);
+                var current_correction = compareSlots(current_answer_fact,the_query_sub_task.correct_answer);
                 insertanswers.insertInAnswer(answerid,sessionAttributes.current_workerid,sessionAttributes.signin_Name,the_query_sub_task.subtaskId,sessionAttributes.current_taskid,current_correction);
                 console.log("Store answer in the answer table end");
                 console.log("here the query sub task is valiod 11111111111111111111");
@@ -502,18 +544,9 @@ const FactGatherIntentHandler = {
                             )
                                  }
                         
-                            })                            
-                    })
+                    })                            
+                })
             
-
-
-
-
-
-
-
-
-
 
 
 
@@ -590,8 +623,146 @@ const FactGatherIntentHandler = {
 
 
 
+/*
+
+        var attributes = handlerInput.attributesManager.getSessionAttributes();
+        
+        console.log(attributes.current_taskid);
+        var  A= attributes.states === states.QUIZ;
+        var B= attributes.current_taskid === "1" ;
+        var C = Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest';
+       console.log(A + " "+B+" "+C);
+
+          return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'&& attributes.states === states.QUIZ && attributes.current_taskid === "1";
+          //&& Alexa.getIntentName(handlerInput.requestEnvelope) === 'YesOrNoanswerIntent'
+ 
+ */
+
+const Question_three_Handler = {
+    canHandle(handlerInput) {
+       /* const attributes = handlerInput.attributesManager.getSessionAttributes();
+        
+        console.log(attributes.current_taskid);
+       return attributes.states === states.QUIZ && attributes.current_taskid === "3" && Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' ;*/
+       var attributes = handlerInput.attributesManager.getSessionAttributes();
+                    
+       console.log(attributes.current_taskid);
+       var A= attributes.states === states.QUIZ;
+       var B= attributes.current_taskid === "3" ;
+       var C = Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest';
+       console.log(" in third intent")
+       console.log(A + " "+B+" "+ C) ;
+       console.log("第三个intent： " +  Alexa.getRequestType(handlerInput.requestEnvelope))
+       return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'&& attributes.states === states.QUIZ && attributes.current_taskid === "3";
+      
+    },
+    handle(handlerInput) {
+
+          return new Promise((resolve,reject)=>{
+            console.log("In the gact gather intent");
+            const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+            const current_taskid = sessionAttributes.current_taskid;
+            var current_answer_voice= getSlotValue(handlerInput.requestEnvelope, 'transcripslot');    
+            //var current_question_des;
+            var order = sessionAttributes.current_order;
+            //resolve the user name 
+
+      
+           let speakOutput ="HI, this is your first task" + "<speak><audio src = 'https://s3.amazonaws.com/dante.crowdsoucing.project/king.mp3' /></speak>";
+           
+           //'<audio src="https://s3.amazonaws.com/waanimals-deployment-scripts/alexa-audio/' +       '.mp3" /> ';
+           //https://s3.amazonaws.com/dante.crowdsoucing.project/king.mp3
+            console.log("Inside question three handler - handle");
+            
+                //找到order 1 的全部信息
+                //find column of the order i
+                proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,order,the_query_sub_task=>{
 
 
+                    //如果带practice则存进去
+                   
+                   if(the_query_sub_task.practice == false){
+                    //存进answer
+                    console.log("Store answer in the answer table start");
+                    let answerid = uuids.v4();
+                    var current_correction = compareSlots(current_answer_voice,the_query_sub_task.correct_answer);
+                    insertanswers.insertInAnswer(answerid,sessionAttributes.current_workerid,sessionAttributes.signin_Name,the_query_sub_task.subtaskId,sessionAttributes.current_taskid,current_correction);
+                    console.log("Store answer in the answer table end");
+                    console.log("here the query sub task is valiod 11111111111111111111");
+
+                   }
+                   
+                    //move to next questions
+                    sessionAttributes.current_order +=1;
+                    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                    var neworder = sessionAttributes.current_order;
+
+                        
+                       
+                        //找到order 2 的全部信息并问下一个问题
+                        //find the column of i+1 question and ask for the i+2
+                        proptfirstQuestion.getQuestionBy_orderAndTask(current_taskid,neworder,the_second_query_sub_task=>{
+                            if(the_second_query_sub_task)
+                            {
+
+                                console.log("Here's come's to asking the second function, the order is already plus one, current order is " +sessionAttributes.current_order);
+                                soundurl = '<audio  src="'+the_second_query_sub_task.description+'"/>' 
+                                speakOutput = "Here is the question"+ sessionAttributes.current_order+": "+"<break time='1s'/>"+ "Please answer " + the_second_query_sub_task.subtaskname +"or say repeat to repeat the question !"
+                            +"<break time='2s'/>"+ soundurl;
+                            sessionAttributes.current_question_des =  soundurl;
+                            reprompt = soundurl;   
+                            const response = handlerInput.responseBuilder
+                                .speak(speakOutput)
+                                .reprompt(reprompt)
+                                .getResponse();
+                            resolve(response);
+                            return;
+
+                            }
+                            else{
+                                   //if there are no quiz for task1 , the intent will tell user it's over and ask user to ask for new task.
+                                    //it will set order back to one and change the current state since quiz is over
+                            
+                                    console.log("here the query sub task is invalid 22222222222222222222222");
+                                    speakOutput = "you are finish this task, which task are you going to do next!";
+                                    reprompt  = "tell me which task you are want to do";
+                                    //mark task one as complete 
+                                    sessionAttributes.current_order = 1;
+                                    sessionAttributes.states = states.START;
+                                    var list = sessionAttributes.current_task_progess;
+                                    let change_status = list .find((p) => {
+                                        return p.task_id === current_taskid;
+                                    });
+                                    change_status.task_status = "complete";
+                                    sessionAttributes.current_task_progess = list;
+                                    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+                                    //mark task one as complete in database
+                                    update_progress.update_the_progress(sessionAttributes.current_workerid,sessionAttributes.signin_Name,list,update_status=>{
+
+                                        console.log("here change the status of task progress");
+                                        const response = handlerInput.responseBuilder
+                                                    .speak(speakOutput)
+                                                    .reprompt(reprompt)
+                                                    .getResponse();
+                                                resolve(response);
+                                                return;
+
+                                    }
+                                )
+                                     }
+                            
+                                })                            
+                        })
+                
+        
+    
+            
+        })
+            
+        
+        
+    }
+};
 
 
 
@@ -647,6 +818,38 @@ function compareSlots(slots, value) {
 
 
 
+const RepeatHandler = {
+    canHandle(handlerInput) {
+      console.log("Inside RepeatHandler");
+      var B= Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.RepeatIntent' ;
+      var C = Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest';
+      console.log("in repeat "+ " "+B+" "+C);
+  
+      return Alexa.getRequestType(handlerInput.requestEnvelope) ==='IntentRequest'&&
+             Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.RepeatIntent';
+    },
+    handle(handlerInput) {
+
+          return new Promise((resolve,reject)=>{
+            //resolve the user name 
+           
+           
+            console.log("Inside RepeatHandler - handle");
+            const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+            const question =sessionAttributes.current_question_des;
+            const speakOutput = question
+
+            
+            const response = handlerInput.responseBuilder
+            .speak(speakOutput)
+            .reprompt(reprompt)
+            .getResponse();
+        resolve(response);
+        return;
+    
+        })
+    }
+  };
 
 
 
@@ -735,9 +938,9 @@ exports.handler = Alexa.SkillBuilders.custom()
         SignInIntentHandler,
         CheckAvalibleIntentHandler,
         StartquestionIntentHandler,
-        RepeatHandler,
         YesOrNoanswerIntentHandler,
         FactGatherIntentHandler,
+        Question_three_Handler,
         RepeatHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,

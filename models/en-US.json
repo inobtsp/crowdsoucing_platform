@@ -89,17 +89,19 @@
                     ]
                 },
                 {
-                    "name": "TranscriptionIntent",
+                    "name": "Question_three_Intent",
                     "slots": [
                         {
                             "name": "transcripslot",
                             "type": "AMAZON.SearchQuery"
                         }
                     ],
-                    "samples": []
+                    "samples": [
+                        "Answer is {transcripslot}",
+                        "Ok  {transcripslot}"
+                    ]
                 }
             ],
-            
             "types": [
                 {
                     "name": "YesOrNo",
@@ -137,9 +139,8 @@
             "intents": [
                 {
                     "name": "YesOrNoanswerIntent",
-                    "prompts": {
-                        "confirmation": "Confirm.Intent.1350406825038"
-                    },
+                    "confirmationRequired": false,
+                    "prompts": {},
                     "slots": [
                         {
                             "name": "YesOrNo",
@@ -152,10 +153,8 @@
                 },
                 {
                     "name": "FactGatherIntent",
-
-                    "prompts": {
-                        "confirmation": "Confirm.Intent.660976665349"
-                    },
+                    "confirmationRequired": false,
+                    "prompts": {},
                     "slots": [
                         {
                             "name": "the_fact",
@@ -163,6 +162,22 @@
                             "confirmationRequired": false,
                             "elicitationRequired": false,
                             "prompts": {}
+                        }
+                    ]
+                },
+                {
+                    "name": "Question_three_Intent",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "transcripslot",
+                            "type": "AMAZON.SearchQuery",
+                            "confirmationRequired": false,
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.1135641691908.1465164823171"
+                            }
                         }
                     ]
                 }
@@ -194,6 +209,15 @@
                     {
                         "type": "PlainText",
                         "value": "Your answer is {the_fact} , Is that right?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.1135641691908.1465164823171",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "transcipt"
                     }
                 ]
             }
