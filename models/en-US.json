@@ -83,9 +83,12 @@
                     "samples": [
                         "In {the_fact}",
                         "It's {the_fact}",
-                        "in {the_fact}",
                         "On {the_fact}",
-                        "I think {the_fact} "
+                        "I think {the_fact}",
+                        "you are {the_fact}",
+                        "the answer is {the_fact}",
+                        "it should be {the_fact}",
+                        "there are {the_fact}"
                     ]
                 },
                 {
@@ -97,8 +100,62 @@
                         }
                     ],
                     "samples": [
-                        "Answer is {transcripslot}",
+                        "he said {transcripslot}",
+                        "he say {transcripslot}",
+                        "he says {transcripslot}",
+                        "she said {transcripslot}",
+                        "she say {transcripslot}",
+                        "she says {transcripslot}",
                         "Ok  {transcripslot}"
+                    ]
+                },
+                {
+                    "name": "Question_Four_Intent",
+                    "slots": [
+                        {
+                            "name": "emotional",
+                            "type": "YesOrNo",
+                            "samples": [
+                                "neutral",
+                                "joy",
+                                "surprise",
+                                "disgust",
+                                "fear",
+                                "angry",
+                                "sad"
+                            ]
+                        }
+                    ],
+                    "samples": [
+                        "He is {emotional}",
+                        "She is {emotional}"
+                    ]
+                },
+                {
+                    "name": "Question_five_Intent",
+                    "slots": [
+                        {
+                            "name": "review_result",
+                            "type": "review_result"
+                        }
+                    ],
+                    "samples": [
+                        "{review_result}",
+                        "I think he is {review_result}",
+                        "his answer is {review_result}",
+                        "he was did {review_result}"
+                    ]
+                },
+                {
+                    "name": "Question_Six_Intent",
+                    "slots": [
+                        {
+                            "name": "the_real_fact",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "my answer is {the_real_fact}"
                     ]
                 }
             ],
@@ -129,6 +186,66 @@
                         {
                             "name": {
                                 "value": "yes"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "surprise"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "joy"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "fear"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "disgust"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "angry"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "sad"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "review_result",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "wrong"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "right"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "false"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "true"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "unknown"
                             }
                         }
                     ]
@@ -178,6 +295,34 @@
                             "prompts": {
                                 "elicitation": "Elicit.Slot.1135641691908.1465164823171"
                             }
+                        }
+                    ]
+                },
+                {
+                    "name": "Question_Four_Intent",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "emotional",
+                            "type": "YesOrNo",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {}
+                        }
+                    ]
+                },
+                {
+                    "name": "Question_five_Intent",
+                    "confirmationRequired": false,
+                    "prompts": {},
+                    "slots": [
+                        {
+                            "name": "review_result",
+                            "type": "review_result",
+                            "confirmationRequired": false,
+                            "elicitationRequired": false,
+                            "prompts": {}
                         }
                     ]
                 }

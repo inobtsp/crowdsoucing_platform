@@ -21,21 +21,23 @@ var yyyy = today.getFullYear();
 today = mm + '/' + dd + '/' + yyyy;
 
 module.exports = {
-    insertInAnswer : function(current_answer_id,current_workerid,current_worker_names,current_subtask_id,current_task_id,current_correction,difficulty,task_order){
+
+   
+    insertInsubtask : function(truly_correction,correct_answer,task_des ,prev_answer,subtask_id,task_order){
         console.log("error here 3");
         //paras set set the query, query by worker name
         dynamodb.put({
-            TableName: "Answer",
+            TableName: "subTask",
             Item:{
-                "Answerid": current_answer_id,
-                "ass_workerid": current_workerid,
-                "ass_workername": current_worker_names,
-                "com_question_id": current_subtask_id,
-                "com_task_id": current_task_id,
-                "Correction":current_correction,
-                "complete_time": today,
-                "difficulty": difficulty,
-                "order-of-the-task":task_order
+                "correct_answer":truly_correction ,
+                "description": task_des,
+                "practice": false,
+                "pre_answer": prev_answer,
+                "subtaskId": subtask_id,
+                "subtaskname": "review the answer provide by the other worker for the emotional labeling for the following audio clip. do you agree with their answer? please answer with right , wrong or unknown.",
+                "task_id": "5",
+                "task_order": task_order,
+                "cor_ans_for_pre":correct_answer
               }
            
         },

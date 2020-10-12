@@ -15,7 +15,7 @@ const dynamodb = new AWS.DynamoDB.DocumentClient({
 let taskiid = uuid.v1();
 console.log(taskiid);
 module.exports = {
-    insertByName : function(workername,callback){
+    insertByName : function(workername,job_des,job_status,task_4_statu, task_5_statu,callback){
         //paras set set the query, query by worker name
         dynamodb.put({
             TableName: "theworker",
@@ -41,13 +41,13 @@ module.exports = {
                     {
                      
                         "task_id": "4",
-                        "task_status": "incomplete"
+                        "task_status": task_4_statu
 
                     },
                     {
                     
                         "task_id":"5",
-                        "task_status":"incomplete"
+                        "task_status":task_5_statu
 
                     },
                     {
@@ -55,15 +55,12 @@ module.exports = {
                       "task_status":"incomplete"
                         
                  
-                    },
-                    {
-                    
-                        "task_id": "7",
-                        "task_status": "incomplete"
-                    
                     }
+          
                   ],
                 "workerid": taskiid,
+                "job": job_des,
+                "status": job_status,
                 "workername": workername
               }
             
